@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Helper;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Model\Transaction\Transaction;
-use App\Model\ActivityLog\ActivityLog;
+use App\Model\Settings\ActivityLog;
 use App\User;
 use Schema, DB, Auth;
 use Carbon\Carbon;
@@ -14,7 +14,6 @@ use Jenssegers\Agent\Agent;
 class HelperController extends Controller
 {
     private $agent;
-    
 
     public function __construct(){
         $this->agent = new Agent();
@@ -96,7 +95,7 @@ class HelperController extends Controller
                 'robot' => ($robo) ? $robo. "( " . $this->agent->version($robo) . " )" : "",
                 'device' => $dev,
                 'ip' => $_SERVER['REMOTE_ADDR'] . ":" . $_SERVER['REMOTE_PORT'],
-                'controller' => $route->action['controller'],
+                'function_to_hit' => $route->action['controller'],
                 'user_id' => ($user) ? $user->id : "",
                 'error_code' => $errorCode,
                 'status_code' => $statusCode,
@@ -108,7 +107,7 @@ class HelperController extends Controller
     }
 
 
-    public function store(Request $request){
+    public function storingFunction(Request $request){
         $input = $request->all();
         $routeName = Route::currentRouteName();
         $routeUri = Route::getCurrentRoute()->uri();

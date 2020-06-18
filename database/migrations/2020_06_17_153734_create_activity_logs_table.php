@@ -19,6 +19,7 @@ class CreateActivityLogsTable extends Migration
             $table->string('request_url')->nullable();
             $table->string('os')->nullable();
             $table->string('os_version')->nullable();
+            $table->string('browser')->nullable();
             $table->string('ip')->nullable();
             $table->string('function_to_hit')->nullable();
             $table->string('user_id')->nullable();
