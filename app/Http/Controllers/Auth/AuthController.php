@@ -78,7 +78,6 @@ class AuthController extends Controller
         }else{
             $responseData = $this->helping->responseProcess(1, 1062, "something went wrong.", "");
             return response()->json($responseData);
-            $res = 'something went wrong';
         }
     }
 
@@ -115,6 +114,12 @@ class AuthController extends Controller
       
         $request->user()->token()->revoke();
         $responseData = $this->helping->responseProcess(0, 200, "Successfully logged out", "");
+        return response()->json($responseData);
+    }
+
+
+    public function unAuthMessage(Request $request){
+        $responseData = $this->helping->responseProcess(1, 401, "Sorry, you are not logged in.", "");
         return response()->json($responseData);
     }
 }
