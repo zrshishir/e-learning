@@ -18,6 +18,6 @@ class Lesson extends Model
     }
 
     public function questions(){
-        return $this->hasMany('App\Model\BasicTable\Questions');
+        return $this->hasMany('App\Model\BasicTable\Question');
     }
 }

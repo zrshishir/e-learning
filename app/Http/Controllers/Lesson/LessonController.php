@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Helper\HelperController;
 use App\Model\BasicTable\Lesson;
+use App\Model\BasicTable\Course;
 use Auth, Validator, DB;
 
 class LessonController extends Controller
@@ -18,10 +19,11 @@ class LessonController extends Controller
     }
 
     public function index(){
-    	$datas = Lesson::get();
+        $datas = Lesson::with('course')->get();
+        $courses = Course::get();
         
     	if(! empty($datas)){
-            return response()->json($this->helping->indexData($datas));
+            return response()->json($this->helping->indexData(['datas' => $datas, 'courses'=>$courses]));
         }else{
             return response()->json($this->helping->noContent());
         } 
@@ -69,8 +71,9 @@ class LessonController extends Controller
                 $bug = $e->errorInfo[1];
             }
             if($bug == 0){
-                $datas = Lesson::get();
-                return response()->json($this->helping->savingData($datas));
+                $datas = Lesson::with('course')->get();
+                $courses = Course::get();
+                return response()->json($this->helping->savingData(['datas' => $datas, 'courses'=>$courses]));
             } elseif($bug == 1062){
                 $responseData = $this->helping->responseProcess(1, 1062, "Data is found duplicate.", "");
                 return response()->json($responseData); 
@@ -109,8 +112,9 @@ class LessonController extends Controller
                 $bug = $e->errorInfo[1];
             }
             if($bug == 0){
-                $datas = Lesson::get();
-                return response()->json($this->helping->savingData($datas));
+                $datas = Lesson::with('course')->get();
+                $courses = Course::get();
+                return response()->json($this->helping->savingData(['datas' => $datas, 'courses'=>$courses]));
             } elseif($bug == 1062){
                 $responseData = $this->helping->responseProcess(1, 1062, "Data is found duplicate.", "");
                 return response()->json($responseData); 
@@ -143,8 +147,9 @@ class LessonController extends Controller
                 $bug = $e->errorInfo[1];
             }
             if($bug == 0){
-                $datas = Lesson::get();
-                return response()->json($this->helping->deletingData($datas));
+                $datas = Lesson::with('course')->get();
+                $courses = Course::get();
+                return response()->json($this->helping->deletingData(['datas' => $datas, 'courses'=>$courses]));
             } elseif($bug == 1062){
                 $responseData = $this->helping->responseProcess(1, 1062, "Data is found duplicate.", "");
                 return response()->json($responseData); 
@@ -154,7 +159,8 @@ class LessonController extends Controller
             }
         }
 
-        $datas = Lesson::get();
-        return response()->json($this->helping->invalidDeleteId($datas));
+        $datas = Lesson::with('course')->get();
+        $courses = Course::get();
+        return response()->json($this->helping->invalidDeleteId(['datas' => $datas, 'courses'=>$courses]));
     }
 }

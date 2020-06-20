@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Helper\HelperController;
 use App\Model\BasicTable\Question;
+use App\Model\BasicTable\Lesson;
 use Auth, Validator, DB;
 
 class QuestionController extends Controller
@@ -18,10 +19,15 @@ class QuestionController extends Controller
     }
 
     public function index(){
-    	$datas = Question::get();
+        $datas = DB::table('questions')
+                            ->leftJoin('lessons', 'questions.lesson_id', '=', 'lessons.id')
+                            ->leftJoin('courses', 'lessons.course_id', '=', 'courses.id')
+                            ->select('questions.*', 'lessons.name as lesson_name', 'courses.name as course_name')
+                            ->get();
+        $lessons = Lesson::get();
         
     	if(! empty($datas)){
-            return response()->json($this->helping->indexData($datas));
+            return response()->json($this->helping->indexData(['datas'=>$datas, 'lessons'=>$lessons]));
         }else{
             return response()->json($this->helping->noContent());
         } 
@@ -86,8 +92,13 @@ class QuestionController extends Controller
                 $bug = $e->errorInfo[1];
             }
             if($bug == 0){
-                $datas = Question::get();
-                return response()->json($this->helping->savingData($datas));
+                $datas = DB::table('questions')
+                            ->leftJoin('lessons', 'questions.lesson_id', '=', 'lessons.id')
+                            ->leftJoin('courses', 'lessons.course_id', '=', 'courses.id')
+                            ->select('questions.*', 'lessons.name as lesson_name', 'courses.name as course_name')
+                            ->get();
+                $lessons = Lesson::get();
+                return response()->json($this->helping->savingData(['datas'=>$datas, 'lessons'=>$lessons]));
             } elseif($bug == 1062){
                 $responseData = $this->helping->responseProcess(1, 1062, "Data is found duplicate.", "");
                 return response()->json($responseData); 
@@ -131,8 +142,13 @@ class QuestionController extends Controller
                 $bug = $e->errorInfo[1];
             }
             if($bug == 0){
-                $datas = Question::get();
-                return response()->json($this->helping->savingData($datas));
+                $datas = DB::table('questions')
+                            ->leftJoin('lessons', 'questions.lesson_id', '=', 'lessons.id')
+                            ->leftJoin('courses', 'lessons.course_id', '=', 'courses.id')
+                            ->select('questions.*', 'lessons.name as lesson_name', 'courses.name as course_name')
+                            ->get();
+                $lessons = Lesson::get();
+                return response()->json($this->helping->savingData(['datas'=>$datas, 'lessons'=>$lessons]));
             } elseif($bug == 1062){
                 $responseData = $this->helping->responseProcess(1, 1062, "Data is found duplicate.", "");
                 return response()->json($responseData); 
@@ -165,8 +181,13 @@ class QuestionController extends Controller
                 $bug = $e->errorInfo[1];
             }
             if($bug == 0){
-                $datas = Question::get();
-                return response()->json($this->helping->deletingData($datas));
+                $datas = DB::table('questions')
+                            ->leftJoin('lessons', 'questions.lesson_id', '=', 'lessons.id')
+                            ->leftJoin('courses', 'lessons.course_id', '=', 'courses.id')
+                            ->select('questions.*', 'lessons.name as lesson_name', 'courses.name as course_name')
+                            ->get();
+                $lessons = Lesson::get();
+                return response()->json($this->helping->deletingData(['datas'=>$datas, 'lessons'=>$lessons]));
             } elseif($bug == 1062){
                 $responseData = $this->helping->responseProcess(1, 1062, "Data is found duplicate.", "");
                 return response()->json($responseData); 
@@ -176,7 +197,12 @@ class QuestionController extends Controller
             }
         }
 
-        $datas = Question::get();
-        return response()->json($this->helping->invalidDeleteId($datas));
+        $datas = DB::table('questions')
+                            ->leftJoin('lessons', 'questions.lesson_id', '=', 'lessons.id')
+                            ->leftJoin('courses', 'lessons.course_id', '=', 'courses.id')
+                            ->select('questions.*', 'lessons.name as lesson_name', 'courses.name as course_name')
+                            ->get();
+        $lessons = Lesson::get();
+        return response()->json($this->helping->invalidDeleteId(['datas'=>$datas, 'lessons'=>$lessons]));
     }
 }
