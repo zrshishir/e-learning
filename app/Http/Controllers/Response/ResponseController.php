@@ -40,20 +40,13 @@ class ResponseController extends Controller
         $lessonId = $id;
         $userId = Auth::user()->id;
 
-        $dts = DB::table('questions')
-                
-                ->join('responses', function($join) use($lessonId)
-                {
-                    $join->on('questions.id', '!=', 'responses.question_id')->where('questions.lesson_id', $lessonId);
-                })
-                ->select('questions.*')
-                ->get();
-return response()->json($dts);
+        
         $questions = DB::table('questions')
-                                ->leftJoin('responses', 'questions.id', '!=', 'responses.question_id')
-                                ->where('questions.lesson_id', $lessonId)
-                                ->select('questions.id', 'questions.question', 'questions.option1', 'questions.option2', 'questions.option3', 'questions.option4')
-                                ->get();
+                            ->leftJoin('responses', 'questions.id', '=', 'responses.question_id')
+                            ->where('questions.lesson_id', $lessonId)
+                            ->whereNull('responses.question_id')
+                            ->select('questions.id', 'questions.question', 'questions.option1', 'questions.option2', 'questions.option3', 'questions.option4')
+                            ->get();
         
         $datas = DB::table('user_courses')
                                 ->leftJoin('courses', 'user_courses.course_id', '=', 'courses.id')
@@ -62,10 +55,10 @@ return response()->json($dts);
                                 ->select('lessons.*')
                                 ->get();
         
-    	if(count($questions) > 0){
+    	if(count($questions) > 0 && count($datas) > 0){
             return response()->json($this->helping->indexData(['questions' => $questions, 'lessons' => $datas]));
         }else{
-            $responseData = $this->helping->responseProcess(1, 200, "You have answered all the questions, please select a different lesson or assign to new course.", "");
+            $responseData = $this->helping->responseProcess(1, 200, "You have answered all the questions, please select a different lesson or assign to new course.", ['lessons' => $datas]);
             return response()->json($responseData); 
         } 
     }
@@ -114,8 +107,8 @@ return response()->json($dts);
                 $bug = $e->errorInfo[1];
             }
             if($bug == 0){
-                $datas = Response::get();
-                return response()->json($this->helping->savingData($datas));
+                $responseData = $this->helping->responseProcess(2, 200, "Your answer has been submitted.", "");
+                return response()->json($responseData);
             } elseif($bug == 1062){
                 $responseData = $this->helping->responseProcess(1, 1062, "Data is found duplicate.", "");
                 return response()->json($responseData); 
