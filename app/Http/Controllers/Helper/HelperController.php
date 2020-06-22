@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Helper;
 
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 use App\Http\Controllers\Controller;
 use App\Model\Transaction\Transaction;
 use App\Model\Settings\ActivityLog;

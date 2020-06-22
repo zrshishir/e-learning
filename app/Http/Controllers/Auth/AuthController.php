@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Helper\HelperController;
 use Validator, DB;
@@ -17,7 +18,7 @@ class AuthController extends Controller
         $this->helping = new HelperController();
     }
 
-    public function signup(Request $request){
+    public function signup(Request $request): JsonResponse{
         $validator = Validator::make($request->all(), [
             'name' => 'required|string',
             'email' => 'required|string|unique:users',
@@ -28,11 +29,9 @@ class AuthController extends Controller
         if($validator->fails()){
             $errors = $validator->errors();
             $errorMsg = "";
-
             foreach ($errors->all() as $msg) {
                 $errorMsg .= $msg;
             }
-
             $responseData = $this->helping->responseProcess(1, 422, $errorMsg, "");
 
             return response()->json($responseData);
@@ -81,7 +80,7 @@ class AuthController extends Controller
         }
     }
 
-    public function login(Request $request){ 
+    public function login(Request $request): JsonResponse{ 
         $user = User::where('email', $request->email)->first();
         if(! $user){
             $responseData = $this->helping->responseProcess(1, 401, "User does not exist. Please Sign Up.", "");
@@ -108,7 +107,7 @@ class AuthController extends Controller
         } 
     }
 
-    public function logout(Request $request)
+    public function logout(Request $request): JsonResponse
     {
         $loggedInChecked = Auth::check();
       
@@ -118,7 +117,7 @@ class AuthController extends Controller
     }
 
 
-    public function unAuthMessage(Request $request){
+    public function unAuthMessage(Request $request): JsonResponse{
         $responseData = $this->helping->responseProcess(1, 401, "Sorry, you are not logged in.", "");
         return response()->json($responseData);
     }

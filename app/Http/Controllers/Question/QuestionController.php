@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Question;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 use App\Http\Controllers\Helper\HelperController;
 use App\Model\BasicTable\Question;
 use App\Model\BasicTable\Lesson;
@@ -18,7 +19,7 @@ class QuestionController extends Controller
         $this->helping = new HelperController();
     }
 
-    public function index(){
+    public function index(): JsonResponse{
         $datas = DB::table('questions')
                             ->leftJoin('lessons', 'questions.lesson_id', '=', 'lessons.id')
                             ->leftJoin('courses', 'lessons.course_id', '=', 'courses.id')
@@ -33,7 +34,7 @@ class QuestionController extends Controller
         } 
     }
 
-    public function store(Request $request){
+    public function store(Request $request): JsonResponse{
 
         $validator = Validator::make($request->all(), [
                 'lesson_id' => 'required|numeric',
@@ -56,7 +57,7 @@ class QuestionController extends Controller
             return response()->json($this->helping->validatingErrors($errorMsg));
         }
 
-        $totalQuestion = Question::where('lesson_id', $request->lesson_id)->where('question', $request->question)->count();
+        $totalQuestion = Question::where('lesson_id', $request->lesson_id)->count();
         
         if($totalQuestion > 10){
             $responseData = $this->helping->responseProcess(1, 200, "you have enlisted 10 questions already.", "");
@@ -159,7 +160,7 @@ class QuestionController extends Controller
         }
     }
 
-     public function delete($id){
+     public function delete($id): JsonResponse{
         if($id){
             if(! is_numeric($id)){
                 return response()->json($this->helping->notNumeric());

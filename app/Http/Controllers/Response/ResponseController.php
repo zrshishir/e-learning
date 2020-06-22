@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Response;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 use App\Http\Controllers\Helper\HelperController;
 use App\Model\BasicTable\Response;
 use App\Model\BasicTable\Question;
@@ -19,7 +20,7 @@ class ResponseController extends Controller
         $this->helping = new HelperController();
     }
 
-    public function index(){
+    public function index(): JsonResponse{
         $userId = Auth::user()->id;
         $datas = DB::table('user_courses')
                         ->leftJoin('courses', 'user_courses.course_id', '=', 'courses.id')
@@ -36,7 +37,7 @@ class ResponseController extends Controller
         } 
     }
 
-    public function question($id){
+    public function question($id): JsonResponse{
         $lessonId = $id;
         $userId = Auth::user()->id;
 
@@ -63,7 +64,7 @@ class ResponseController extends Controller
         } 
     }
 
-    public function store(Request $request){
+    public function store(Request $request): JsonResponse{
 
         $validator = Validator::make($request->all(), [
                 'question_id' => 'required|numeric',
@@ -159,7 +160,7 @@ class ResponseController extends Controller
         }
     }
 
-     public function delete($id){
+     public function delete($id): JsonResponse{
         if($id){
             if(! is_numeric($id)){
                 return response()->json($this->helping->notNumeric());

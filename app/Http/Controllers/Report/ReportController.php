@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Report;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 use App\Http\Controllers\Helper\HelperController;
 use App\Model\BasicTable\Response;
 use App\Model\BasicTable\Question;
@@ -19,7 +20,7 @@ class ReportController extends Controller
         $this->helping = new HelperController();
     }
 
-    public function personalReport(){
+    public function personalReport(): JsonResponse{
         $userId = Auth::user()->id;
         $totalRes = Response::where('user_id', $userId)
                                 ->count();

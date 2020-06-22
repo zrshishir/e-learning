@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Course;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
 use App\Http\Controllers\Helper\HelperController;
 use App\Model\BasicTable\Course;
 use Auth, Validator, DB;
@@ -17,7 +18,7 @@ class CourseController extends Controller
         $this->helping = new HelperController();
     }
 
-    public function index(){
+    public function index(): JsonResponse{
     	$datas = Course::get();
         
     	if(! empty($datas)){
@@ -27,7 +28,7 @@ class CourseController extends Controller
         } 
     }
 
-    public function store(Request $request){
+    public function store(Request $request): JsonResponse{
 
         $validator = Validator::make($request->all(), [
                 'name' => 'required|string'
@@ -106,7 +107,7 @@ class CourseController extends Controller
         }
     }
 
-     public function delete($id){
+     public function delete($id): JsonResponse{
         if($id){
             if(! is_numeric($id)){
                 return response()->json($this->helping->notNumeric());
