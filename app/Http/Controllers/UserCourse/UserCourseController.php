@@ -49,7 +49,7 @@ class UserCourseController extends Controller
         }
         
         if(! $request->id){
-            $dtExist = UserCourse::where('user_id', $request->user_id)->where('course_id', $request->course_id)->first();
+            $dtExist = UserCourse::where('user_id', $userId)->where('course_id', $request->course_id)->first();
         
             if(! is_null($dtExist)){
                 return response()->json($this->helping->existData());

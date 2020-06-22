@@ -40,14 +40,9 @@ class ResponseController extends Controller
     public function question($id): JsonResponse{
         $lessonId = $id;
         $userId = Auth::user()->id;
-
         
-        $questions = DB::table('questions')
-                            ->leftJoin('responses', 'questions.id', '=', 'responses.question_id')
-                            ->where('questions.lesson_id', $lessonId)
-                            ->whereNull('responses.question_id')
-                            ->select('questions.id', 'questions.question', 'questions.option1', 'questions.option2', 'questions.option3', 'questions.option4')
-                            ->get();
+        $resp = Response::where('user_id', $userId)->pluck('question_id');
+        $questions = Question::where('lesson_id', $lessonId)->whereNotIn('id', $resp)->get();
         
         $datas = DB::table('user_courses')
                                 ->leftJoin('courses', 'user_courses.course_id', '=', 'courses.id')
@@ -65,7 +60,7 @@ class ResponseController extends Controller
     }
 
     public function store(Request $request): JsonResponse{
-
+        $userId = Auth::user()->id;
         $validator = Validator::make($request->all(), [
                 'question_id' => 'required|numeric',
                 'response' => 'required|string',
@@ -84,7 +79,7 @@ class ResponseController extends Controller
         $answer = Question::find($request->question_id)->correct_option;
         // return response()->json($answer);
         if(! $request->id){
-            $dtExist = Response::where('question_id', $request->question_id)->where('response', $request->response)->first();
+            $dtExist = Response::where('question_id', $request->question_id)->where('user_id', $userId)->first();
         
             if(! is_null($dtExist)){
                 return response()->json($this->helping->existData());
@@ -94,7 +89,7 @@ class ResponseController extends Controller
                 DB::beginTransaction();
     
                 Response::create([
-                    'user_id' => Auth::user()->id,
+                    'user_id' => $userId,
                     'question_id' => $request->question_id,
                     'response' => $request->response,
                     'right_wrong' => ($answer == $request->response) ? 1 : 0,

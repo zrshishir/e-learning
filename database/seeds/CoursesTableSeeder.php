@@ -15,9 +15,7 @@ class CoursesTableSeeder extends Seeder
     {
         Model::unguard();
         Course::insert([
-            ['user_id'=>1, 'name'=>'course1', 'active'=>1],
-            ['user_id'=>1, 'name'=>'course2', 'active'=>1],
-            ['user_id'=>1, 'name'=>'course3', 'active'=>1]
+            ['user_id'=>1, 'name'=>'course1', 'active'=>1]
         ]);
     }
 }

@@ -59,7 +59,7 @@ class QuestionController extends Controller
 
         $totalQuestion = Question::where('lesson_id', $request->lesson_id)->count();
         
-        if($totalQuestion > 10){
+        if($totalQuestion >= 10){
             $responseData = $this->helping->responseProcess(1, 200, "you have enlisted 10 questions already.", "");
             return response()->json($responseData);
         }
