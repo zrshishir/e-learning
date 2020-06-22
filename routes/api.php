@@ -46,6 +46,12 @@ Route::group([],function(){
         Route::get('response', 'Response\ResponseController@index');
         Route::post('response', 'Response\ResponseController@store');
         Route::delete('response/{id}', 'Response\ResponseController@delete');
+        Route::get('question/{id}', 'Response\ResponseController@question');
+
+        //user-course
+        Route::get('user-course', 'UserCourse\UserCourseController@index');
+        Route::post('user-course', 'UserCourse\UserCourseController@store');
+        Route::delete('user-course/{id}', 'UserCourse\UserCourseController@delete');
 
         
     });

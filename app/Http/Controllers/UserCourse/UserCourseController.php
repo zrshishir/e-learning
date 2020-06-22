@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Helper\HelperController;
 use App\Model\BasicTable\UserCourse;
+use App\Model\BasicTable\Course;
 use Auth, Validator, DB;
 
 class UserCourseController extends Controller
@@ -18,19 +19,20 @@ class UserCourseController extends Controller
     }
 
     public function index(){
-    	$datas = UserCourse::get();
+        $userId = Auth::user()->id;
+        $datas = UserCourse::where('user_id', $userId)->with('course')->get();
+        $courses = Course::get();
         
     	if(! empty($datas)){
-            return response()->json($this->helping->indexData($datas));
+            return response()->json($this->helping->indexData(['datas' => $datas, 'courses'=>$courses]));
         }else{
             return response()->json($this->helping->noContent());
         } 
     }
 
     public function store(Request $request){
-
+        $userId = Auth::user()->id;
         $validator = Validator::make($request->all(), [
-                'user_id' => 'required|numeric',
                 'course_id' => 'required|numeric'
             ]);
             
@@ -56,7 +58,7 @@ class UserCourseController extends Controller
                 DB::beginTransaction();
     
                 UserCourse::create([
-                    'user_id' => $request->user_id,
+                    'user_id' => $userId,
                     'course_id' => $request->course_id,
                     'active' => 1
                 ]);
@@ -68,8 +70,9 @@ class UserCourseController extends Controller
                 $bug = $e->errorInfo[1];
             }
             if($bug == 0){
-                $datas = UserCourse::get();
-                return response()->json($this->helping->savingData($datas));
+                $datas = UserCourse::where('user_id', $userId)->with('course')->get();
+                $courses = Course::get();
+                return response()->json($this->helping->savingData(['datas' => $datas, 'courses'=>$courses]));
             } elseif($bug == 1062){
                 $responseData = $this->helping->responseProcess(1, 1062, "Data is found duplicate.", "");
                 return response()->json($responseData); 
@@ -95,7 +98,7 @@ class UserCourseController extends Controller
                 DB::beginTransaction();
     
                 UserCourse::where('id', $request->id)->update([
-                    'user_id' => $request->user_id,
+                    'user_id' => $userId,
                     'course_id' => $request->course_id,
                     'active' => 1
                 ]);
@@ -107,8 +110,9 @@ class UserCourseController extends Controller
                 $bug = $e->errorInfo[1];
             }
             if($bug == 0){
-                $datas = UserCourse::get();
-                return response()->json($this->helping->savingData($datas));
+                $datas = UserCourse::where('user_id', $userId)->with('course')->get();
+                $courses = Course::get();
+                return response()->json($this->helping->savingData(['datas' => $datas, 'courses'=>$courses]));
             } elseif($bug == 1062){
                 $responseData = $this->helping->responseProcess(1, 1062, "Data is found duplicate.", "");
                 return response()->json($responseData); 
@@ -120,6 +124,7 @@ class UserCourseController extends Controller
     }
 
      public function delete($id){
+        $userId = Auth::user()->id;
         if($id){
             if(! is_numeric($id)){
                 return response()->json($this->helping->notNumeric());
@@ -141,8 +146,9 @@ class UserCourseController extends Controller
                 $bug = $e->errorInfo[1];
             }
             if($bug == 0){
-                $datas = UserCourse::get();
-                return response()->json($this->helping->deletingData($datas));
+                $datas = UserCourse::where('user_id', $userId)->with('course')->get();
+                $courses = Course::get();
+                return response()->json($this->helping->deletingData(['datas' => $datas, 'courses'=>$courses]));
             } elseif($bug == 1062){
                 $responseData = $this->helping->responseProcess(1, 1062, "Data is found duplicate.", "");
                 return response()->json($responseData); 
@@ -152,7 +158,8 @@ class UserCourseController extends Controller
             }
         }
 
-        $datas = UserCourse::get();
-        return response()->json($this->helping->invalidDeleteId($datas));
+        $datas = UserCourse::where('user_id', $userId)->with('course')->get();
+        $courses = Course::get();
+        return response()->json($this->helping->invalidDeleteId(['datas' => $datas, 'courses'=>$courses]));
     }
 }

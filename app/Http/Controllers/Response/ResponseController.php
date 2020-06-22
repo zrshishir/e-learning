@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Helper\HelperController;
 use App\Model\BasicTable\Response;
 use App\Model\BasicTable\Question;
+use App\Model\BasicTable\UserCourse;
 use Auth, Validator, DB;
 
 class ResponseController extends Controller
@@ -19,12 +20,53 @@ class ResponseController extends Controller
     }
 
     public function index(){
-    	$datas = Response::get();
+        $userId = Auth::user()->id;
+        $datas = DB::table('user_courses')
+                        ->leftJoin('courses', 'user_courses.course_id', '=', 'courses.id')
+                        ->leftJoin('lessons', 'courses.id', '=', 'lessons.course_id')
+                        ->where('user_courses.user_id', $userId)
+                        ->select('lessons.*')
+                        ->get();
         
-    	if(! empty($datas)){
-            return response()->json($this->helping->indexData($datas));
+    	if(count($datas) > 0){
+            return response()->json($this->helping->indexData(['lessons'=>$datas]));
         }else{
-            return response()->json($this->helping->noContent());
+            $responseData = $this->helping->responseProcess(1, 200, "You have not assigned a course yet, please take courses.", "");
+            return response()->json($responseData); 
+        } 
+    }
+
+    public function question($id){
+        $lessonId = $id;
+        $userId = Auth::user()->id;
+
+        $dts = DB::table('questions')
+                
+                ->join('responses', function($join) use($lessonId)
+                {
+                    $join->on('questions.id', '!=', 'responses.question_id')->where('questions.lesson_id', $lessonId);
+                })
+                ->select('questions.*')
+                ->get();
+return response()->json($dts);
+        $questions = DB::table('questions')
+                                ->leftJoin('responses', 'questions.id', '!=', 'responses.question_id')
+                                ->where('questions.lesson_id', $lessonId)
+                                ->select('questions.id', 'questions.question', 'questions.option1', 'questions.option2', 'questions.option3', 'questions.option4')
+                                ->get();
+        
+        $datas = DB::table('user_courses')
+                                ->leftJoin('courses', 'user_courses.course_id', '=', 'courses.id')
+                                ->leftJoin('lessons', 'courses.id', '=', 'lessons.course_id')
+                                ->where('user_courses.user_id', $userId)
+                                ->select('lessons.*')
+                                ->get();
+        
+    	if(count($questions) > 0){
+            return response()->json($this->helping->indexData(['questions' => $questions, 'lessons' => $datas]));
+        }else{
+            $responseData = $this->helping->responseProcess(1, 200, "You have answered all the questions, please select a different lesson or assign to new course.", "");
+            return response()->json($responseData); 
         } 
     }
 
